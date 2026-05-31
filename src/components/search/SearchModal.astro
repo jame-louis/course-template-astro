@@ -87,8 +87,11 @@
   async function initPagefind() {
     if (pagefind) return true;
     try {
+      // Use string concatenation to prevent Vite from analyzing this import at build time
+      // Pagefind is generated after build, so the file doesn't exist during Astro build
+      const pagefindPath = '/pagefind/pagefind.js';
       // @ts-ignore
-      const mod = await import(/* @vite-ignore */ '/pagefind/pagefind.js');
+      const mod = await import(pagefindPath);
       pagefind = mod;
       await pagefind.init();
       return true;
