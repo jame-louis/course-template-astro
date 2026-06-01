@@ -2,6 +2,7 @@
 import CourseLayout from '../layouts/CourseLayout.astro';
 import { getCollection } from 'astro:content';
 
+const base = import.meta.env.BASE_URL || '/';
 const lectures = await getCollection('lectures');
 const assignments = await getCollection('assignments');
 
@@ -31,7 +32,7 @@ const weeks = Array.from({ length: maxWeek }, (_, i) => {
 });
 
 function getLectureRef(lecture: typeof sortedLectures[0]) {
-  return `/lectures/${lecture.id.replace('.md', '')}`;
+  return `${base}lectures/${lecture.id.replace('.md', '')}`;
 }
 ---
 
@@ -80,7 +81,7 @@ function getLectureRef(lecture: typeof sortedLectures[0]) {
               <div class="flex items-center flex-wrap gap-2">
                 <span class="px-2 py-1 bg-amber-100 text-amber-700 text-xs rounded">作业</span>
                 <a
-                  href={`/assignments/${assignment.id}`}
+                  href={`${base}assignments/${assignment.id}`}
                   class="font-medium hover:text-primary"
                 >
                   HW{assignment.data.assignmentNumber}: {assignment.data.title}
