@@ -1,5 +1,5 @@
 import { defineCollection, z } from 'astro:content';
-import { moduleNames, contentDefaults } from './config/course';
+import { moduleNames, contentDefaults } from './config';
 
 const lectures = defineCollection({
   type: 'content',
