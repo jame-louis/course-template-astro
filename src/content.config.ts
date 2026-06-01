@@ -25,8 +25,13 @@ const assignments = defineCollection({
     title: z.string(),
     assignmentNumber: z.number(),
     lectureRef: z.string(),
+    week: z.number().optional(),
     difficulty: z.enum(['easy', 'medium', 'hard']).default('medium'),
+    estimatedHours: z.number().optional(),
+    points: z.number().optional(),
     submissionFormat: z.string().default(contentDefaults.submissionFormat),
+    downloadFile: z.string().optional(),
+    dueDate: z.date().optional(),
     draft: z.boolean().default(false),
   }),
 });
