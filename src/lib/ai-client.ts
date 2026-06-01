@@ -1,3 +1,5 @@
+import axios, { AxiosResponse } from 'axios';
+
 import type { AISettings } from './ai-settings';
 
 export interface Message {
@@ -106,42 +108,29 @@ export class AIClient {
   private async streamOpenAI(messages: Message[], callbacks: StreamCallbacks): Promise<void> {
     const url = this.settings.apiUrl || 'https://api.openai.com/v1/chat/completions';
 
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${this.settings.apiKey}`,
-      },
-      body: JSON.stringify({
-        model: this.settings.model,
-        stream: true,
-        messages: messages.map(m => ({
-          role: m.role,
-          content: m.content,
-        })),
-      }),
-    });
-
-    if (!response.ok) {
-      const error = await response.text();
-      throw new Error(`OpenAI API error: ${error}`);
-    }
-
-    const reader = response.body?.getReader();
-    if (!reader) throw new Error('No response body');
-
-    const decoder = new TextDecoder();
-    let buffer = '';
-
     try {
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
+      const response: AxiosResponse = await axios({
+        method: 'post',
+        url: url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${this.settings.apiKey}`,
+        },
+        data: {
+          model: this.settings.model,
+          stream: true,
+          messages: messages.map(m => ({
+            role: m.role,
+            content: m.content,
+          })),
+        },
+        responseType: 'stream',
+      });
 
-        buffer += decoder.decode(value, { stream: true });
-        const lines = buffer.split('\n');
-        buffer = lines.pop() || '';
+      const stream = response.data;
 
+      stream.on('data', (chunk: Buffer) => {
+        const lines = chunk.toString().split('\n');
         for (const line of lines) {
           if (line.startsWith('data: ')) {
             const data = line.slice(6);
@@ -160,11 +149,21 @@ export class AIClient {
             }
           }
         }
+      });
+
+      stream.on('end', () => {
+        callbacks.onComplete();
+      });
+
+      stream.on('error', (error: Error) => {
+        callbacks.onError(error);
+      });
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        throw new Error(`OpenAI API error: ${error.response?.data?.error?.message || error.message}`);
       }
-    } finally {
-      reader.releaseLock();
+      throw error;
     }
-    callbacks.onComplete();
   }
 
   private async streamCustom(messages: Message[], callbacks: StreamCallbacks): Promise<void> {
