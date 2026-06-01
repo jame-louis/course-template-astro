@@ -1,5 +1,3 @@
-import axios, { AxiosResponse } from 'axios';
-
 import type { AISettings } from './ai-settings';
 
 export interface Message {
@@ -66,6 +64,57 @@ export class AIClient {
       throw new Error(`Anthropic API error: ${error}`);
     }
 
+    await this.handleStream(response, callbacks, 'anthropic');
+  }
+
+  private async streamOpenAI(messages: Message[], callbacks: StreamCallbacks): Promise<void> {
+    const url = this.settings.apiUrl || 'https://api.openai.com/v1/chat/completions';
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${this.settings.apiKey}`,
+      },
+      body: JSON.stringify({
+        model: this.settings.model,
+        stream: true,
+        messages: messages.map(m => ({
+          role: m.role,
+          content: m.content,
+        })),
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      let errorMessage = errorText;
+      try {
+        const errorJson = JSON.parse(errorText);
+        errorMessage = errorJson.error?.message || errorText;
+      } catch {
+        // Use raw error text
+      }
+      throw new Error(`OpenAI API error: ${errorMessage}`);
+    }
+
+    await this.handleStream(response, callbacks, 'openai');
+  }
+
+  private async streamCustom(messages: Message[], callbacks: StreamCallbacks): Promise<void> {
+    if (!this.settings.apiUrl) {
+      throw new Error('Custom API URL is required');
+    }
+
+    // Custom provider - assumes OpenAI-compatible format
+    await this.streamOpenAI(messages, callbacks);
+  }
+
+  private async handleStream(
+    response: Response,
+    callbacks: StreamCallbacks,
+    provider: 'anthropic' | 'openai'
+  ): Promise<void> {
     const reader = response.body?.getReader();
     if (!reader) throw new Error('No response body');
 
@@ -90,57 +139,14 @@ export class AIClient {
             }
             try {
               const parsed = JSON.parse(data);
-              if (parsed.type === 'content_block_delta' && parsed.delta?.text) {
-                callbacks.onChunk(parsed.delta.text);
+              let content: string | undefined;
+
+              if (provider === 'anthropic') {
+                content = parsed.type === 'content_block_delta' ? parsed.delta?.text : undefined;
+              } else {
+                content = parsed.choices?.[0]?.delta?.content;
               }
-            } catch {
-              // Ignore parse errors
-            }
-          }
-        }
-      }
-    } finally {
-      reader.releaseLock();
-    }
-    callbacks.onComplete();
-  }
 
-  private async streamOpenAI(messages: Message[], callbacks: StreamCallbacks): Promise<void> {
-    const url = this.settings.apiUrl || 'https://api.openai.com/v1/chat/completions';
-
-    try {
-      const response: AxiosResponse = await axios({
-        method: 'post',
-        url: url,
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this.settings.apiKey}`,
-        },
-        data: {
-          model: this.settings.model,
-          stream: true,
-          messages: messages.map(m => ({
-            role: m.role,
-            content: m.content,
-          })),
-        },
-        responseType: 'stream',
-      });
-
-      const stream = response.data;
-
-      stream.on('data', (chunk: Buffer) => {
-        const lines = chunk.toString().split('\n');
-        for (const line of lines) {
-          if (line.startsWith('data: ')) {
-            const data = line.slice(6);
-            if (data === '[DONE]') {
-              callbacks.onComplete();
-              return;
-            }
-            try {
-              const parsed = JSON.parse(data);
-              const content = parsed.choices?.[0]?.delta?.content;
               if (content) {
                 callbacks.onChunk(content);
               }
@@ -149,29 +155,12 @@ export class AIClient {
             }
           }
         }
-      });
-
-      stream.on('end', () => {
-        callbacks.onComplete();
-      });
-
-      stream.on('error', (error: Error) => {
-        callbacks.onError(error);
-      });
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        throw new Error(`OpenAI API error: ${error.response?.data?.error?.message || error.message}`);
       }
-      throw error;
+    } catch (error) {
+      callbacks.onError(error instanceof Error ? error : new Error(String(error)));
+    } finally {
+      reader.releaseLock();
     }
-  }
-
-  private async streamCustom(messages: Message[], callbacks: StreamCallbacks): Promise<void> {
-    if (!this.settings.apiUrl) {
-      throw new Error('Custom API URL is required');
-    }
-
-    // Custom provider - assumes OpenAI-compatible format
-    await this.streamOpenAI(messages, callbacks);
+    callbacks.onComplete();
   }
 }
