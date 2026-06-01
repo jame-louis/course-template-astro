@@ -10,14 +10,14 @@ export const GET: APIRoute = async () => {
       title: entry.data.title,
       description: entry.data.description,
       content: entry.body?.slice(0, 800) || '',
-      slug: `/lectures/${entry.slug}`,
+      slug: `${import.meta.env.BASE_URL}lectures/${entry.slug}`,
       type: 'lectures',
     })),
     ...assignments.map(entry => ({
       title: entry.data.title,
       description: '',
       content: entry.body?.slice(0, 800) || '',
-      slug: `/assignments/${entry.slug}`,
+      slug: `${import.meta.env.BASE_URL}assignments/${entry.slug}`,
       type: 'assignments',
     })),
   ];
