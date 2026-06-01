@@ -1,5 +1,6 @@
 ---
 import DocLayout from '../../layouts/DocLayout.astro';
+import AITutor from '../../components/ai-tutor/AITutor.astro';
 import { getCollection, render } from 'astro:content';
 import { difficultyLabels, labels, lectureLabels } from '../../config';
 
@@ -200,6 +201,8 @@ const relatedAssignment = allAssignments.find(a => a.data.lectureRef === slug &&
       )}
     </div>
   </nav>
+
+  <AITutor context={{ type: 'lecture', title: lecture.data.title, module: lecture.data.module }} />
 
   <script>
     import { isCompleted, toggleComplete } from '../../lib/progress';
