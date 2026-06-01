@@ -26,7 +26,6 @@ export const homeActions = {
 export const mainNavItems = [
   { label: '首页', href: '/' },
   { label: '课程大纲', href: '/syllabus' },
-  { label: '课程表', href: '/schedule' },
   { label: '课程', href: '/lectures' },
   { label: '作业', href: '/assignments' },
 ] as const;
@@ -40,7 +39,6 @@ export const pageTitles = {
   home: '首页',
   lectures: '课程列表',
   assignments: '作业',
-  schedule: '课程表',
   syllabus: '课程大纲',
 } as const;
 
@@ -107,14 +105,6 @@ export const syllabusLabels = {
   lectureRangeTemplate: '第{start}-{end}讲',
 } as const;
 
-export const scheduleLabels = {
-  pageTitle: '课程表',
-  weekSuffix: '周',
-  courseBadge: '课程',
-  assignmentBadge: '作业',
-  emptyState: '暂无安排',
-} as const;
-
 export const infoSectionLabels = {
   courseInfoTitle: '课程信息',
   textbookLabel: '教材',
@@ -133,28 +123,6 @@ export const courseObjectives = [
   '理解响应式设计和组件化开发思想',
   '具备独立分析和解决前端问题的能力',
 ] as const;
-
-// Deprecated: for removed collections (to be cleaned up in Phase 3)
-export const projectLabels = {
-  pageTitle: '课程项目',
-  description: '综合项目练习',
-  projectLabel: '项目',
-  milestonesTitle: '项目里程碑',
-} as const;
-
-export const materialsLabels = {
-  pageTitle: '学习资料',
-  description: '推荐的学习资源',
-  tagPrefix: '#',
-} as const;
-
-export const materialTypeLabels: Record<string, string> = {
-  article: '文章',
-  video: '视频',
-  code: '代码',
-  tool: '工具',
-  book: '书籍',
-};
 
 export const categoryLabels: Record<string, string> = {
   lectures: '讲义',
