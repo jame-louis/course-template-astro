@@ -6,7 +6,6 @@ const lectures = defineCollection({
   schema: z.object({
     title: z.string(),
     lectureNumber: z.number(),
-    week: z.number().optional(),
     module: z.enum(moduleNames),
     description: z.string(),
     duration: z.string().default(contentDefaults.duration),
@@ -17,7 +16,6 @@ const lectures = defineCollection({
     hasAssignment: z.boolean().default(false),
     slidevUrl: z.string().optional(),
     draft: z.boolean().default(false),
-    publishDate: z.date().optional(),
   }),
 });
 
@@ -27,48 +25,13 @@ const assignments = defineCollection({
     title: z.string(),
     assignmentNumber: z.number(),
     lectureRef: z.string(),
-    week: z.number().optional(),
-    dueDate: z.date().optional(),
     difficulty: z.enum(['easy', 'medium', 'hard']).default('medium'),
-    estimatedHours: z.number().default(2),
     submissionFormat: z.string().default(contentDefaults.submissionFormat),
-    points: z.number().default(100),
-    downloadFile: z.string().optional(),
     draft: z.boolean().default(false),
-  }),
-});
-
-const projects = defineCollection({
-  type: 'content',
-  schema: z.object({
-    title: z.string(),
-    projectNumber: z.number(),
-    description: z.string(),
-    milestones: z.array(z.object({
-      title: z.string(),
-      dueDate: z.date().optional(),
-      description: z.string(),
-    })).default([]),
-    totalPoints: z.number().default(100),
-    draft: z.boolean().default(false),
-  }),
-});
-
-const materials = defineCollection({
-  type: 'content',
-  schema: z.object({
-    title: z.string(),
-    type: z.enum(['article', 'video', 'code', 'tool', 'book']),
-    url: z.string().optional(),
-    description: z.string(),
-    lectureRef: z.string().optional(),
-    tags: z.array(z.string()).default([]),
   }),
 });
 
 export const collections = {
   lectures,
   assignments,
-  projects,
-  materials,
 };
