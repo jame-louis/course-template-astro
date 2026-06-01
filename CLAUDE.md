@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is an Astro-based static site template for university course websites (前端框架课程). It provides a complete system for managing course lectures and assignments with features like progress tracking, search, and responsive design.
+This is an Astro-based static site template for university course websites. It provides a complete system for managing course lectures and assignments with features like progress tracking, search, and responsive design.
 
 ## Development Commands
 
@@ -37,7 +37,7 @@ Content files are stored in `src/content/{collection}/` as Markdown with YAML fr
 ---
 title: string
 lectureNumber: number
-module: '基础入门' | '核心概念' | 'JavaScript基础' | 'Bootstrap框架' | 'Vue.js框架' | '其他'
+module: '基础入门' | '核心概念' 
 description: string
 duration: string
 difficulty: 'beginner' | 'intermediate' | 'advanced'

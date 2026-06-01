@@ -1,6 +1,6 @@
-# Frontend Framework Course Site
+# Course Site
 
-Astro-based static site for the Frontend Framework course (前端框架课程).
+Astro-based static site for the course.
 
 ## Structure
 
