@@ -2,6 +2,8 @@
 import CourseLayout from '../layouts/CourseLayout.astro';
 import { getCollection } from 'astro:content';
 
+const base = import.meta.env.BASE_URL || '/';
+
 const lectures = await getCollection('lectures');
 const sortedLectures = lectures
   .filter(l => !l.data.draft)
@@ -33,13 +35,13 @@ const courseInfo = {
       </p>
       <div class="flex flex-col sm:flex-row gap-4 justify-center">
         <a
-          href="/lectures"
+          href={`${base}lectures`}
           class="inline-flex items-center justify-center px-6 py-3 bg-primary text-white font-medium rounded-lg hover:bg-primary-dark transition-colors"
         >
           开始学习
         </a>
         <a
-          href="/syllabus"
+          href={`${base}syllabus`}
           class="inline-flex items-center justify-center px-6 py-3 bg-white text-text font-medium rounded-lg border border-border hover:bg-bg-secondary transition-colors"
         >
           查看大纲
@@ -97,14 +99,14 @@ const courseInfo = {
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between items-center mb-8">
         <h2 class="text-2xl font-bold">课程列表</h2>
-        <a href="/lectures" class="text-primary hover:text-primary-dark font-medium">
+        <a href={`${base}lectures`} class="text-primary hover:text-primary-dark font-medium">
           查看全部 →
         </a>
       </div>
       <div class="grid gap-4">
         {sortedLectures.slice(0, 6).map(lecture => (
           <a
-            href={`/lectures/${lecture.id.replace('.md', '')}`}
+            href={`${base}lectures/${lecture.id.replace('.md', '')}`}
             class="flex items-center gap-4 p-4 bg-white rounded-lg border border-border hover:border-primary hover:shadow-sm transition-all"
           >
             <span class="flex-shrink-0 w-10 h-10 bg-primary text-white rounded-md flex items-center justify-center font-semibold">

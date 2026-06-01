@@ -2,6 +2,7 @@
 import CourseLayout from '../layouts/CourseLayout.astro';
 import { getCollection } from 'astro:content';
 
+const base = import.meta.env.BASE_URL || '/';
 const lectures = await getCollection('lectures');
 const sortedLectures = lectures
   .filter(l => !l.data.draft)
@@ -69,7 +70,7 @@ const difficultyColors: Record<string, string> = {
               const slug = lecture.id.replace('.md', '');
               return (
                 <a
-                  href={`/lectures/${slug}`}
+                  href={`${base}lectures/${slug}`}
                   class="group block sm:flex items-start sm:items-center gap-3 sm:gap-4 p-4 bg-bg-secondary rounded-lg border border-border hover:border-primary hover:shadow-md transition-all"
                   data-slug={slug}
                 >
@@ -130,7 +131,7 @@ const difficultyColors: Record<string, string> = {
 
     <!-- Back Link -->
     <div class="mt-8 sm:mt-12 p-4 sm:p-6 bg-bg-secondary rounded-lg text-center">
-      <a href="/" class="text-primary hover:text-primary-dark font-medium inline-flex items-center gap-2">
+      <a href={import.meta.env.BASE_URL} class="text-primary hover:text-primary-dark font-medium inline-flex items-center gap-2">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
         </svg>

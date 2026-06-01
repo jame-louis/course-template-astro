@@ -1,12 +1,13 @@
 ---
+const base = import.meta.env.BASE_URL || '/';
 const navItems = [
-  { href: '/', label: '首页' },
-  { href: '/syllabus', label: '课程大纲' },
-  { href: '/schedule', label: '课程表' },
-  { href: '/lectures', label: '课程' },
-  { href: '/assignments', label: '作业' },
-  { href: '/projects', label: '项目' },
-  { href: '/materials', label: '资料' },
+  { href: base, label: '首页' },
+  { href: `${base}syllabus`, label: '课程大纲' },
+  { href: `${base}schedule`, label: '课程表' },
+  { href: `${base}lectures`, label: '课程' },
+  { href: `${base}assignments`, label: '作业' },
+  { href: `${base}projects`, label: '项目' },
+  { href: `${base}materials`, label: '资料' },
 ];
 
 const currentPath = Astro.url.pathname;
@@ -16,7 +17,7 @@ const currentPath = Astro.url.pathname;
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex justify-between items-center h-16">
       <!-- Logo -->
-      <a href="/" class="text-xl font-semibold text-text hover:text-primary transition-colors">
+      <a href={base} class="text-xl font-semibold text-text hover:text-primary transition-colors">
         课程网站
       </a>
 
